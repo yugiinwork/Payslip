@@ -5,7 +5,7 @@ import PreviousPayslipsPage from './components/PreviousPayslipsPage';
 import { calculateSalary } from './utils/calculations';
 import { exportToPDF } from './utils/export';
 import { fetchEmployees, fetchPayslips, insertPayslip, upsertEmployee } from './lib/repository';
-import { isSupabaseConfigured } from './lib/supabase';
+import { isSupabaseConfigured, checkSupabaseConnection } from './lib/supabase';
 
 const PROFILE_STORAGE_KEY = 'payslip_profiles';
 const PAYSLIPS_STORAGE_KEY = 'payslip_records';
@@ -208,7 +208,8 @@ function App() {
   const hasHydratedProfile = useRef(false);
 
   const [calculations, setCalculations] = useState(calculateSalary(formData));
-  const [statusMessage, setStatusMessage] = useState(isSupabaseConfigured ? 'Supabase connected.' : 'Supabase not configured. Using local storage fallback.');
+  const [statusType, setStatusType] = useState(isSupabaseConfigured ? 'warning' : 'error');
+  const [statusMessage, setStatusMessage] = useState(isSupabaseConfigured ? 'Connecting to Supabase...' : 'Supabase not configured. Using local storage fallback.');
 
   useEffect(() => {
     setCalculations(calculateSalary(formData));
@@ -233,6 +234,11 @@ function App() {
       const bootstrap = async () => {
         if (isSupabaseConfigured) {
           try {
+            const isConnected = await checkSupabaseConnection();
+            if (!isConnected) {
+              throw new Error('Could not connect to Supabase.');
+            }
+
             const [employees, payslips] = await Promise.all([fetchEmployees(), fetchPayslips()]);
             const profiles = Object.fromEntries(
               employees.map((employee) => [employee.employeeId || employee.employeeName, employee])
@@ -252,8 +258,10 @@ function App() {
               }));
             }
 
-            setStatusMessage('Loaded employees and payslips from Supabase.');
-          } catch {
+            setStatusType('success');
+            setStatusMessage('Supabase connected. Data synchronized.');
+          } catch (error) {
+            console.error('Bootstrap failed:', error);
             const profiles = loadProfilesFromStorage();
             const firstProfileKey = Object.keys(profiles)[0];
             setSavedProfiles(profiles);
@@ -267,7 +275,8 @@ function App() {
                 arrearsDays: prev.arrearsDays,
               }));
             }
-            setStatusMessage('Supabase tables are not ready yet. Using local storage fallback.');
+            setStatusType('warning');
+            setStatusMessage('Supabase connection failed or tables missing. Using local storage fallback.');
           }
         } else {
           const profiles = loadProfilesFromStorage();
@@ -417,9 +426,11 @@ function App() {
 
       try {
         await upsertEmployee(formData);
+        setStatusType('success');
         setStatusMessage('Employee profile saved to Supabase.');
         alert('Auto-fill profile updated.');
       } catch {
+        setStatusType('warning');
         setStatusMessage('Could not save to Supabase. Kept a local fallback copy.');
         alert('Saved locally. Run the Supabase schema, then try again.');
       }
@@ -492,8 +503,10 @@ function App() {
             ),
           ]);
         }
+        setStatusType('success');
         setStatusMessage('Payslip archived in Supabase.');
       } catch {
+        setStatusType('warning');
         setStatusMessage('Could not archive payslip in Supabase. Kept a local fallback copy.');
       }
     };
@@ -526,6 +539,7 @@ function App() {
         formData={formData}
         profileOptions={profileOptions}
         statusMessage={statusMessage}
+        statusType={statusType}
         handleInputChange={handleInputChange}
         handleBranchChange={handleBranchChange}
         handleEmployeeNameChange={handleEmployeeNameChange}

@@ -65,6 +65,7 @@ export const fetchEmployees = async () => {
     .order('employee_name', { ascending: true });
 
   if (error) {
+    console.error('Error fetching employees:', error);
     throw error;
   }
 
@@ -88,6 +89,7 @@ export const upsertEmployee = async (formData) => {
     .single();
 
   if (error) {
+    console.error('Error upserting employee:', error);
     throw error;
   }
 
@@ -105,6 +107,7 @@ export const fetchPayslips = async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
+    console.error('Error fetching payslips:', error);
     throw error;
   }
 
@@ -145,6 +148,7 @@ export const insertPayslip = async ({ formData, calculations, employeeId }) => {
     .single();
 
   if (error) {
+    console.error('Error inserting payslip:', error);
     throw error;
   }
 

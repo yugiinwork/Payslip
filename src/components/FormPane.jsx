@@ -1,10 +1,11 @@
 import React from 'react';
-import { Plus, Trash2, Save, RotateCcw } from 'lucide-react';
+import { Plus, Trash2, Save, RotateCcw, Cloud, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function FormPane({
   formData,
   profileOptions,
   statusMessage,
+  statusType,
   handleInputChange,
   handleBranchChange,
   handleEmployeeNameChange,
@@ -24,7 +25,13 @@ export default function FormPane({
         <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: '700' }}>Payslip Format Builder</h2>
       </div>
 
-      <div className="status-banner">{statusMessage}</div>
+      <div className={`status-banner status-banner-${statusType}`}>
+        {statusType === 'success' && <CheckCircle2 size={16} />}
+        {statusType === 'error' && <AlertCircle size={16} />}
+        {statusType === 'warning' && <AlertCircle size={16} />}
+        {statusType === 'info' && <Loader2 size={16} className="animate-spin" />}
+        {statusMessage}
+      </div>
 
       <div className="form-section">
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-main)' }}>Company Branch</label>
@@ -38,7 +45,7 @@ export default function FormPane({
         </select>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button className="btn btn-primary" onClick={saveProfile} style={{ flex: 1 }}>
-            <Save size={18} /> Update Auto-Fill
+            <Cloud size={18} /> Save to Cloud / Update
           </button>
           <button className="btn btn-outline" onClick={viewPreviousPayslips} style={{ flex: 1 }}>
             View Previous Payslips
