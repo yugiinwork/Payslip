@@ -52,11 +52,33 @@ const DEDUCTION_TEMPLATES = {
   UAE: [],
 };
 
+const IDENTIFICATION_TEMPLATES = {
+  India: [
+    { id: 1, name: 'PAN Number', value: '' },
+    { id: 2, name: 'AADHAR No', value: '' },
+    { id: 3, name: 'IFSC Code', value: '' },
+    { id: 4, name: 'PF Account Number', value: '' },
+    { id: 5, name: 'UAN Number', value: '' },
+    { id: 6, name: 'ESIC Account Number', value: '' },
+  ],
+  UAE: [
+    { id: 1, name: 'PAN Number', value: '' },
+    { id: 2, name: 'AADHAR No', value: '' },
+    { id: 3, name: 'IFSC Code', value: '' },
+    { id: 4, name: 'PF Account Number', value: '' },
+    { id: 5, name: 'UAN Number', value: '' },
+    { id: 6, name: 'ESIC Account Number', value: '' },
+  ],
+};
+
 const buildEarningsForBranch = (branch) =>
   EARNING_TEMPLATES[branch].map((row) => ({ ...row }));
 
 const buildDeductionsForBranch = (branch) =>
   DEDUCTION_TEMPLATES[branch].map((row) => ({ ...row }));
+
+const buildIdentificationForBranch = (branch) =>
+  IDENTIFICATION_TEMPLATES[branch].map((row) => ({ ...row }));
 
 const getPreviousMonthInfo = () => {
   const now = new Date();
@@ -116,15 +138,9 @@ const createDefaultState = (branch = 'India') => {
   location: '',
   city: '',
   group: '',
-  panNumber: '',
-  aadhaarNumber: '',
   joiningDate: '',
   bankName: '',
   accountNumber: '',
-  ifscCode: '',
-  pfAccountNumber: '',
-  uanNumber: '',
-  esicAccountNumber: '',
   monthYear: previousMonthInfo.monthYear,
   workingDays: previousMonthInfo.totalDays,
   leavesTaken: '0',
@@ -134,6 +150,7 @@ const createDefaultState = (branch = 'India') => {
   taxRegime: 'New Tax Regime',
   earnings: buildEarningsForBranch(branch),
   deductions: buildDeductionsForBranch(branch),
+  identification: buildIdentificationForBranch(branch),
   ...BRANCH_PRESETS[branch],
   };
 };
@@ -162,6 +179,7 @@ const hydrateProfile = (profile) => {
     ...profile,
     earnings: profile.earnings?.length ? profile.earnings : buildEarningsForBranch(branch),
     deductions: profile.deductions?.length ? profile.deductions : buildDeductionsForBranch(branch),
+    identification: profile.identification?.length ? profile.identification : buildIdentificationForBranch(branch),
   };
 };
 
@@ -343,6 +361,7 @@ function App() {
         branch: newBranch,
         earnings: buildEarningsForBranch(newBranch),
         deductions: buildDeductionsForBranch(newBranch),
+        identification: buildIdentificationForBranch(newBranch),
         ...BRANCH_PRESETS[newBranch],
       })
     );
@@ -398,6 +417,29 @@ function App() {
     setFormData((prev) => ({
       ...prev,
       deductions: prev.deductions.filter((item) => item.id !== id),
+    }));
+  };
+
+  const handleIdentificationChange = (id, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      identification: prev.identification.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const addIdentification = () => {
+    setFormData((prev) => ({
+      ...prev,
+      identification: [...prev.identification, { id: Date.now(), name: '', value: '' }],
+    }));
+  };
+
+  const removeIdentification = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      identification: prev.identification.filter((item) => item.id !== id),
     }));
   };
 
@@ -549,6 +591,9 @@ function App() {
         handleDeductionChange={handleDeductionChange}
         addDeduction={addDeduction}
         removeDeduction={removeDeduction}
+        handleIdentificationChange={handleIdentificationChange}
+        addIdentification={addIdentification}
+        removeIdentification={removeIdentification}
         saveProfile={saveProfile}
         resetForm={resetForm}
         viewPreviousPayslips={() => {

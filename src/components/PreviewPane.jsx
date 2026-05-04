@@ -78,8 +78,7 @@ const detailRowsLeft = (formData) => [
   ['City', formData.city],
   ['Group', formData.group],
   ['Department', formData.department],
-  ['Permanent Account Number', formData.panNumber],
-  ['AADHAR No', formData.aadhaarNumber],
+  ...formData.identification.slice(0, Math.ceil(formData.identification.length / 2)).map(item => [item.name, item.value]),
   ['Date of Joining', formatDate(formData.joiningDate)],
 ];
 
@@ -87,10 +86,7 @@ const detailRowsRight = (formData) => [
   ['Company', formData.company],
   ['Bank Name', formData.bankName],
   ['Bank Account Number', formData.accountNumber],
-  ['IFSC Code', formData.ifscCode],
-  ['PF Account Number', formData.pfAccountNumber],
-  ['UAN Number', formData.uanNumber],
-  ['Esic Account Number', formData.esicAccountNumber],
+  ...formData.identification.slice(Math.ceil(formData.identification.length / 2)).map(item => [item.name, item.value]),
   ['Total Working Days', formData.workingDays],
   ['LOP', formData.leavesTaken],
   ['Arrears Days', formData.arrearsDays],
