@@ -15,6 +15,9 @@ export default function FormPane({
   handleDeductionChange,
   addDeduction,
   removeDeduction,
+  handleIdentificationChange,
+  addIdentification,
+  removeIdentification,
   saveProfile,
   resetForm,
   viewPreviousPayslips,
@@ -112,20 +115,36 @@ export default function FormPane({
             <input type="text" name="department" value={formData.department} onChange={handleInputChange} />
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>PAN Number</label>
-            <input type="text" name="panNumber" value={formData.panNumber} onChange={handleInputChange} />
-          </div>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>AADHAR No</label>
-            <input type="text" name="aadhaarNumber" value={formData.aadhaarNumber} onChange={handleInputChange} />
-          </div>
-        </div>
         <div className="input-group">
           <label>Date of Joining</label>
           <input type="date" name="joiningDate" lang="en-GB" value={formData.joiningDate} onChange={handleInputChange} />
         </div>
+      </div>
+
+      <div className="form-section">
+        <h3 className="form-section-title">Identification & Account Details</h3>
+        {formData.identification.map((item) => (
+          <div key={item.id} className="grid-row-card deduction-row">
+            <input
+              type="text"
+              placeholder="Field Name (e.g. PAN Number)"
+              value={item.name}
+              onChange={(e) => handleIdentificationChange(item.id, 'name', e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Value"
+              value={item.value}
+              onChange={(e) => handleIdentificationChange(item.id, 'value', e.target.value)}
+            />
+            <button className="btn btn-outline icon-btn" onClick={() => removeIdentification(item.id)}>
+              <Trash2 size={16} />
+            </button>
+          </div>
+        ))}
+        <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addIdentification}>
+          <Plus size={16} /> Add Identification Row
+        </button>
       </div>
 
       <div className="form-section">
@@ -146,26 +165,6 @@ export default function FormPane({
           <div className="input-group" style={{ flex: 1 }}>
             <label>Account Number</label>
             <input type="text" name="accountNumber" value={formData.accountNumber} onChange={handleInputChange} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>IFSC Code</label>
-            <input type="text" name="ifscCode" value={formData.ifscCode} onChange={handleInputChange} />
-          </div>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>PF Account Number</label>
-            <input type="text" name="pfAccountNumber" value={formData.pfAccountNumber} onChange={handleInputChange} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>UAN Number</label>
-            <input type="text" name="uanNumber" value={formData.uanNumber} onChange={handleInputChange} />
-          </div>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>ESIC Account Number</label>
-            <input type="text" name="esicAccountNumber" value={formData.esicAccountNumber} onChange={handleInputChange} />
           </div>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
