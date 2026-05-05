@@ -78,7 +78,7 @@ const detailRowsLeft = (formData) => [
   ['City', formData.city],
   ['Group', formData.group],
   ['Department', formData.department],
-  ...formData.identification.slice(0, Math.ceil(formData.identification.length / 2)).map(item => [item.name, item.value]),
+  ... (formData.identification || []).slice(0, Math.ceil((formData.identification || []).length / 2)).map(item => [item.name, item.value]),
   ['Date of Joining', formatDate(formData.joiningDate)],
 ];
 
@@ -86,7 +86,7 @@ const detailRowsRight = (formData) => [
   ['Company', formData.company],
   ['Bank Name', formData.bankName],
   ['Bank Account Number', formData.accountNumber],
-  ...formData.identification.slice(Math.ceil(formData.identification.length / 2)).map(item => [item.name, item.value]),
+  ... (formData.identification || []).slice(Math.ceil((formData.identification || []).length / 2)).map(item => [item.name, item.value]),
   ['Total Working Days', formData.workingDays],
   ['LOP', formData.leavesTaken],
   ['Arrears Days', formData.arrearsDays],
