@@ -52,7 +52,6 @@ const mapEmployeeToRow = (formData) => {
     tax_regime: formData.taxRegime || null,
     earnings: formData.earnings,
     deductions: formData.deductions,
-    identification: formData.identification,
     // Sync identification fields back to columns for compatibility
     pan_number: getIdentificationValue(idents, 'PAN Number'),
     aadhaar_number: getIdentificationValue(idents, 'AADHAR No'),
