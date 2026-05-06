@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, Save, RotateCcw, Cloud, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Save, RotateCcw, Cloud, CheckCircle2, AlertCircle, Loader2, GripVertical } from 'lucide-react';
 
 export default function FormPane({
   formData,
@@ -12,12 +12,15 @@ export default function FormPane({
   handleEarningChange,
   addEarning,
   removeEarning,
+  moveEarning,
   handleDeductionChange,
   addDeduction,
   removeDeduction,
+  moveDeduction,
   handleIdentificationChange,
   addIdentification,
   removeIdentification,
+  moveIdentification,
   saveProfile,
   resetForm,
   viewPreviousPayslips,
@@ -105,16 +108,6 @@ export default function FormPane({
             <input type="text" name="city" value={formData.city} onChange={handleInputChange} />
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>Group</label>
-            <input type="text" name="group" value={formData.group} onChange={handleInputChange} />
-          </div>
-          <div className="input-group" style={{ flex: 1 }}>
-            <label>Department</label>
-            <input type="text" name="department" value={formData.department} onChange={handleInputChange} />
-          </div>
-        </div>
         <div className="input-group">
           <label>Date of Joining</label>
           <input type="date" name="joiningDate" lang="en-GB" value={formData.joiningDate} onChange={handleInputChange} />
@@ -124,10 +117,33 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Identification & Account Details</h3>
         {formData.identification.map((item) => (
-          <div key={item.id} className="grid-row-card deduction-row">
+          <div 
+            key={item.id} 
+            className="grid-row-card deduction-row"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('draggedId', item.id);
+              e.currentTarget.classList.add('dragging');
+            }}
+            onDragEnd={(e) => {
+              e.currentTarget.classList.remove('dragging');
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const draggedId = Number(e.dataTransfer.getData('draggedId'));
+              moveIdentification(draggedId, item.id);
+            }}
+          >
+            <div className="drag-handle">
+              <GripVertical size={16} />
+            </div>
             <input
               type="text"
-              placeholder="Field Name (e.g. PAN Number)"
+              placeholder="Label"
               value={item.name}
               onChange={(e) => handleIdentificationChange(item.id, 'name', e.target.value)}
             />
@@ -192,7 +208,30 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Earnings Table</h3>
         {formData.earnings.map((earning) => (
-          <div key={earning.id} className="grid-row-card">
+          <div 
+            key={earning.id} 
+            className="grid-row-card"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('draggedId', earning.id);
+              e.currentTarget.classList.add('dragging');
+            }}
+            onDragEnd={(e) => {
+              e.currentTarget.classList.remove('dragging');
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const draggedId = Number(e.dataTransfer.getData('draggedId'));
+              moveEarning(draggedId, earning.id);
+            }}
+          >
+            <div className="drag-handle">
+              <GripVertical size={16} />
+            </div>
             <input type="text" placeholder="Earning Name" value={earning.name} onChange={(e) => handleEarningChange(earning.id, 'name', e.target.value)} />
             <input type="number" min="0" placeholder="Monthly Rate" value={earning.monthlyRate} onChange={(e) => handleEarningChange(earning.id, 'monthlyRate', e.target.value)} />
             <input type="number" min="0" placeholder="Current Month" value={earning.currentMonth} readOnly />
@@ -214,7 +253,30 @@ export default function FormPane({
           <div className="table-row-label">No deduction rows for this branch.</div>
         ) : null}
         {formData.deductions.map((deduction) => (
-          <div key={deduction.id} className="grid-row-card deduction-row">
+          <div 
+            key={deduction.id} 
+            className="grid-row-card deduction-row"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('draggedId', deduction.id);
+              e.currentTarget.classList.add('dragging');
+            }}
+            onDragEnd={(e) => {
+              e.currentTarget.classList.remove('dragging');
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const draggedId = Number(e.dataTransfer.getData('draggedId'));
+              moveDeduction(draggedId, deduction.id);
+            }}
+          >
+            <div className="drag-handle">
+              <GripVertical size={16} />
+            </div>
             <input type="text" placeholder="Deduction Name" value={deduction.name} onChange={(e) => handleDeductionChange(deduction.id, 'name', e.target.value)} />
             <input type="number" min="0" placeholder="Amount" value={deduction.amount} onChange={(e) => handleDeductionChange(deduction.id, 'amount', e.target.value)} />
             <button className="btn btn-outline icon-btn" onClick={() => removeDeduction(deduction.id)}>

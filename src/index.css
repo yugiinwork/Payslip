@@ -140,7 +140,7 @@ body {
   font-weight: 600;
   margin-bottom: 16px;
   color: var(--primary);
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
 }
 
@@ -253,13 +253,38 @@ body {
 
 .grid-row-card {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: 24px 2fr 1fr 1fr 1fr 1fr auto;
   gap: 8px;
   margin-bottom: 8px;
+  align-items: center;
 }
 
 .deduction-row {
-  grid-template-columns: 2fr 1fr auto;
+  grid-template-columns: 24px 1fr 1fr auto;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  color: var(--text-muted);
+  cursor: grab;
+  transition: color 0.2s;
+}
+
+.drag-handle:hover {
+  color: var(--secondary);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.5;
+  background: var(--bg-color);
+  border: 1px dashed var(--secondary) !important;
 }
 
 .icon-btn {

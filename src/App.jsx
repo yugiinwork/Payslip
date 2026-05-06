@@ -54,20 +54,22 @@ const DEDUCTION_TEMPLATES = {
 
 const IDENTIFICATION_TEMPLATES = {
   India: [
-    { id: 1, name: 'PAN Number', value: '' },
-    { id: 2, name: 'AADHAR No', value: '' },
-    { id: 3, name: 'IFSC Code', value: '' },
-    { id: 4, name: 'PF Account Number', value: '' },
-    { id: 5, name: 'UAN Number', value: '' },
-    { id: 6, name: 'ESIC Account Number', value: '' },
+    { id: 1, name: 'Department', value: '' },
+    { id: 2, name: 'PAN Number', value: '' },
+    { id: 3, name: 'AADHAR No', value: '' },
+    { id: 4, name: 'IFSC Code', value: '' },
+    { id: 5, name: 'PF Account Number', value: '' },
+    { id: 6, name: 'UAN Number', value: '' },
+    { id: 7, name: 'ESIC Account Number', value: '' },
   ],
   UAE: [
-    { id: 1, name: 'PAN Number', value: '' },
-    { id: 2, name: 'AADHAR No', value: '' },
-    { id: 3, name: 'IFSC Code', value: '' },
-    { id: 4, name: 'PF Account Number', value: '' },
-    { id: 5, name: 'UAN Number', value: '' },
-    { id: 6, name: 'ESIC Account Number', value: '' },
+    { id: 1, name: 'Department', value: '' },
+    { id: 2, name: 'PAN Number', value: '' },
+    { id: 3, name: 'AADHAR No', value: '' },
+    { id: 4, name: 'IFSC Code', value: '' },
+    { id: 5, name: 'PF Account Number', value: '' },
+    { id: 6, name: 'UAN Number', value: '' },
+    { id: 7, name: 'ESIC Account Number', value: '' },
   ],
 };
 
@@ -134,10 +136,8 @@ const createDefaultState = (branch = 'India') => {
   employeeName: '',
   employeeId: '',
   designation: '',
-  department: '',
   location: '',
   city: '',
-  group: '',
   joiningDate: '',
   bankName: '',
   accountNumber: '',
@@ -443,6 +443,48 @@ function App() {
     }));
   };
 
+  const moveEarning = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const next = [...prev.earnings];
+      const draggedIndex = next.findIndex((item) => item.id === draggedId);
+      const targetIndex = next.findIndex((item) => item.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      const [draggedItem] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, draggedItem);
+      return { ...prev, earnings: next };
+    });
+  };
+
+  const moveDeduction = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const next = [...prev.deductions];
+      const draggedIndex = next.findIndex((item) => item.id === draggedId);
+      const targetIndex = next.findIndex((item) => item.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      const [draggedItem] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, draggedItem);
+      return { ...prev, deductions: next };
+    });
+  };
+
+  const moveIdentification = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const nextIdent = [...prev.identification];
+      const draggedIndex = nextIdent.findIndex((item) => item.id === draggedId);
+      const targetIndex = nextIdent.findIndex((item) => item.id === targetId);
+
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const [draggedItem] = nextIdent.splice(draggedIndex, 1);
+      nextIdent.splice(targetIndex, 0, draggedItem);
+
+      return { ...prev, identification: nextIdent };
+    });
+  };
+
   const saveProfile = () => {
     const profileName = formData.employeeName.trim();
     const profileKey = formData.employeeId.trim();
@@ -588,12 +630,15 @@ function App() {
         handleEarningChange={handleEarningChange}
         addEarning={addEarning}
         removeEarning={removeEarning}
+        moveEarning={moveEarning}
         handleDeductionChange={handleDeductionChange}
         addDeduction={addDeduction}
         removeDeduction={removeDeduction}
+        moveDeduction={moveDeduction}
         handleIdentificationChange={handleIdentificationChange}
         addIdentification={addIdentification}
         removeIdentification={removeIdentification}
+        moveIdentification={moveIdentification}
         saveProfile={saveProfile}
         resetForm={resetForm}
         viewPreviousPayslips={() => {

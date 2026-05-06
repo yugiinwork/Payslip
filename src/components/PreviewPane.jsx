@@ -76,8 +76,6 @@ const detailRowsLeft = (formData) => [
   ['Location', formData.location],
   ['Branch', formData.branchOffice],
   ['City', formData.city],
-  ['Group', formData.group],
-  ['Department', formData.department],
   ... (formData.identification || []).slice(0, Math.ceil((formData.identification || []).length / 2)).map(item => [item.name, item.value]),
   ['Date of Joining', formatDate(formData.joiningDate)],
 ];
