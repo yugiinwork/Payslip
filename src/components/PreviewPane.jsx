@@ -101,16 +101,7 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
     amount: computedDeductionAmounts.get(row.id) ?? row.amount,
   }));
 
-  const primaryDeductions = deductionRows.filter((row) => row.category === 'primary');
-  const secondaryDeductions = deductionRows.filter((row) => row.category === 'other');
-
-  const deductionDisplayRows = secondaryDeductions.length > 0
-    ? [
-        ...primaryDeductions,
-        { id: 'other-deductions-heading', name: 'Other Deductions', amount: 'Amount', isSectionHeading: true },
-        ...secondaryDeductions,
-      ]
-    : primaryDeductions;
+  const deductionDisplayRows = deductionRows;
 
   const salaryRowCount = Math.max(calculations.earnings.length, deductionDisplayRows.length);
   const paddedEarnings = [

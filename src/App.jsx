@@ -45,9 +45,8 @@ const EARNING_TEMPLATES = {
 const DEDUCTION_TEMPLATES = {
   India: [
     { id: 1, name: 'PF', amount: '', category: 'primary' },
-    { id: 2, name: 'Gratuity', amount: '', category: 'other' },
-    { id: 3, name: 'PF Employer', amount: '', category: 'other' },
-    { id: 4, name: 'Professional Tax', amount: '', category: 'primary' },
+    { id: 2, name: 'Professional Tax', amount: '', category: 'primary' },
+    { id: 3, name: 'Other Deductions', amount: '', category: 'primary' },
   ],
   UAE: [],
 };
@@ -189,14 +188,7 @@ const reorderList = (list, fromIndex, toIndex) => {
   return nextList;
 };
 
-const getDeductionCategory = (deduction) => {
-  if (deduction.category === 'primary' || deduction.category === 'other') {
-    return deduction.category;
-  }
-
-  const normalized = (deduction.name || '').trim().toLowerCase();
-  return normalized === 'pf' || normalized === 'professional tax' ? 'primary' : 'other';
-};
+const getDeductionCategory = () => 'primary';
 
 const normalizeDeductions = (deductions = []) =>
   deductions.map((deduction) => ({
@@ -497,10 +489,10 @@ function App() {
     }));
   };
 
-  const addDeduction = (category = 'primary') => {
+  const addDeduction = () => {
     setFormData((prev) => ({
       ...prev,
-      deductions: [...prev.deductions, { id: Date.now(), name: '', amount: '', category }],
+      deductions: [...prev.deductions, { id: Date.now(), name: '', amount: '', category: 'primary' }],
     }));
   };
 
@@ -695,6 +687,9 @@ function App() {
         removeEarning={removeEarning}
         reorderEarnings={reorderEarnings}
         reorderDeductions={reorderDeductions}
+        handleDeductionChange={handleDeductionChange}
+        addDeduction={addDeduction}
+        removeDeduction={removeDeduction}
         handleIdentificationChange={handleIdentificationChange}
         addIdentification={addIdentification}
         removeIdentification={removeIdentification}
