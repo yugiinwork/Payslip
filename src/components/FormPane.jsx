@@ -12,24 +12,12 @@ export default function FormPane({
   handleEarningChange,
   addEarning,
   removeEarning,
-  moveEarning,
-  handleDeductionChange,
-  addDeduction,
-  removeDeduction,
-<<<<<<< HEAD
   reorderEarnings,
   reorderDeductions,
   handleIdentificationChange,
   addIdentification,
   removeIdentification,
   reorderIdentification,
-=======
-  moveDeduction,
-  handleIdentificationChange,
-  addIdentification,
-  removeIdentification,
-  moveIdentification,
->>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
   saveProfile,
   resetForm,
   viewPreviousPayslips,
@@ -157,7 +145,6 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Identification & Account Details</h3>
         {formData.identification.map((item) => (
-<<<<<<< HEAD
           <div key={item.id} className="draggable-editor-row" {...getDragHandlers('identification', formData.identification.findIndex((entry) => entry.id === item.id), reorderIdentification)}>
             <div className="drag-handle" title="Drag to rearrange">
               <GripVertical size={16} />
@@ -179,47 +166,6 @@ export default function FormPane({
                 <Trash2 size={16} />
               </button>
             </div>
-=======
-          <div 
-            key={item.id} 
-            className="grid-row-card deduction-row"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData('draggedId', item.id);
-              e.currentTarget.classList.add('dragging');
-            }}
-            onDragEnd={(e) => {
-              e.currentTarget.classList.remove('dragging');
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = 'move';
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              const draggedId = Number(e.dataTransfer.getData('draggedId'));
-              moveIdentification(draggedId, item.id);
-            }}
-          >
-            <div className="drag-handle">
-              <GripVertical size={16} />
-            </div>
-            <input
-              type="text"
-              placeholder="Label"
-              value={item.name}
-              onChange={(e) => handleIdentificationChange(item.id, 'name', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Value"
-              value={item.value}
-              onChange={(e) => handleIdentificationChange(item.id, 'value', e.target.value)}
-            />
-            <button className="btn btn-outline icon-btn" onClick={() => removeIdentification(item.id)}>
-              <Trash2 size={16} />
-            </button>
->>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
           </div>
         ))}
         <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addIdentification}>
@@ -272,7 +218,6 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Earnings Table</h3>
         {formData.earnings.map((earning) => (
-<<<<<<< HEAD
           <div key={earning.id} className="draggable-editor-row" {...getDragHandlers('earnings', formData.earnings.findIndex((entry) => entry.id === earning.id), reorderEarnings)}>
             <div className="drag-handle" title="Drag to rearrange">
               <GripVertical size={16} />
@@ -287,40 +232,6 @@ export default function FormPane({
                 <Trash2 size={16} />
               </button>
             </div>
-=======
-          <div 
-            key={earning.id} 
-            className="grid-row-card"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData('draggedId', earning.id);
-              e.currentTarget.classList.add('dragging');
-            }}
-            onDragEnd={(e) => {
-              e.currentTarget.classList.remove('dragging');
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = 'move';
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              const draggedId = Number(e.dataTransfer.getData('draggedId'));
-              moveEarning(draggedId, earning.id);
-            }}
-          >
-            <div className="drag-handle">
-              <GripVertical size={16} />
-            </div>
-            <input type="text" placeholder="Earning Name" value={earning.name} onChange={(e) => handleEarningChange(earning.id, 'name', e.target.value)} />
-            <input type="number" min="0" placeholder="Monthly Rate" value={earning.monthlyRate} onChange={(e) => handleEarningChange(earning.id, 'monthlyRate', e.target.value)} />
-            <input type="number" min="0" placeholder="Current Month" value={earning.currentMonth} readOnly />
-            <input type="number" min="0" placeholder="Arrears" value={earning.arrears} readOnly />
-            <input type="number" min="0" placeholder="Total" value={earning.total} readOnly />
-            <button className="btn btn-outline icon-btn" onClick={() => removeEarning(earning.id)}>
-              <Trash2 size={16} />
-            </button>
->>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
           </div>
         ))}
         <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addEarning}>
@@ -333,7 +244,6 @@ export default function FormPane({
         {primaryDeductions.length === 0 ? (
           <div className="table-row-label">No deduction rows for this branch.</div>
         ) : null}
-<<<<<<< HEAD
         {primaryDeductions.map((deduction) => (
           <div key={deduction.id} className="draggable-editor-row" {...getDragHandlers('deductions', getGlobalDeductionIndex(deduction.id), reorderDeductions)}>
             <div className="drag-handle" title="Drag to rearrange">
@@ -346,38 +256,6 @@ export default function FormPane({
                 <Trash2 size={16} />
               </button>
             </div>
-=======
-        {formData.deductions.map((deduction) => (
-          <div 
-            key={deduction.id} 
-            className="grid-row-card deduction-row"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData('draggedId', deduction.id);
-              e.currentTarget.classList.add('dragging');
-            }}
-            onDragEnd={(e) => {
-              e.currentTarget.classList.remove('dragging');
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = 'move';
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              const draggedId = Number(e.dataTransfer.getData('draggedId'));
-              moveDeduction(draggedId, deduction.id);
-            }}
-          >
-            <div className="drag-handle">
-              <GripVertical size={16} />
-            </div>
-            <input type="text" placeholder="Deduction Name" value={deduction.name} onChange={(e) => handleDeductionChange(deduction.id, 'name', e.target.value)} />
-            <input type="number" min="0" placeholder="Amount" value={deduction.amount} onChange={(e) => handleDeductionChange(deduction.id, 'amount', e.target.value)} />
-            <button className="btn btn-outline icon-btn" onClick={() => removeDeduction(deduction.id)}>
-              <Trash2 size={16} />
-            </button>
->>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
           </div>
         ))}
         <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={() => addDeduction('primary')}>

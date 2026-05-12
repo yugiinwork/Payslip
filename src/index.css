@@ -253,7 +253,7 @@ body {
 
 .grid-row-card {
   display: grid;
-  grid-template-columns: 24px 2fr 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
   gap: 8px;
   margin-bottom: 8px;
   align-items: center;
@@ -284,7 +284,7 @@ body {
 }
 
 .deduction-row {
-  grid-template-columns: 24px 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
 }
 
 .drag-handle {
