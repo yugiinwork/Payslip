@@ -19,10 +19,10 @@ const BRANCH_PRESETS = {
     company: 'KEVINS ENGINEERING CONSULTANCY LLC',
   },
   India: {
-    companyName: 'KEVINS CONSULTING ENGINEERING SERVICES PVT. LTD',
+    companyName: 'KEVINS CONSULTING ENGINEERING SERVICES PVT LTD',
     companySubtitle: '',
     companyAddress: 'Plot no: 66,67, 3rd floor, SS Fortune building, Balaji nagar, Kukatpally, Hyderabad, Telangana 500072',
-    company: 'KEVINS CONSULTING ENGINEERING SERVICES PVT. LTD',
+    company: 'KEVINS CONSULTING ENGINEERING SERVICES PVT LTD',
   },
 };
 
@@ -286,11 +286,7 @@ function App() {
   const [savedPayslips, setSavedPayslips] = useState(() => loadPayslipsFromStorage());
   const [currentPage, setCurrentPage] = useState('builder');
   const [selectedPayslipRecord, setSelectedPayslipRecord] = useState(null);
-  const [formData, setFormData] = useState(() => {
-    const profiles = loadProfilesFromStorage();
-    const firstProfileKey = Object.keys(profiles)[0];
-    return firstProfileKey ? hydrateProfile(profiles[firstProfileKey]) : createDefaultState();
-  });
+  const [formData, setFormData] = useState(() => createDefaultState());
   const hasHydratedProfile = useRef(false);
 
   const [calculations, setCalculations] = useState(calculateSalary(formData));
@@ -329,55 +325,24 @@ function App() {
             const profiles = Object.fromEntries(
               employees.map((employee) => [employee.employeeId || employee.employeeName, employee])
             );
-            const firstProfileKey = Object.keys(profiles)[0];
 
             setSavedProfiles(profiles);
             setSavedPayslips(payslips);
-
-            if (firstProfileKey) {
-              setFormData((prev) => ({
-                ...hydrateProfile(profiles[firstProfileKey]),
-                monthYear: prev.monthYear,
-                workingDays: prev.workingDays,
-                leavesTaken: prev.leavesTaken,
-                arrearsDays: prev.arrearsDays,
-              }));
-            }
 
             setStatusType('success');
             setStatusMessage('Supabase connected. Data synchronized.');
           } catch (error) {
             console.error('Bootstrap failed:', error);
             const profiles = loadProfilesFromStorage();
-            const firstProfileKey = Object.keys(profiles)[0];
             setSavedProfiles(profiles);
             setSavedPayslips(loadPayslipsFromStorage());
-            if (firstProfileKey) {
-              setFormData((prev) => ({
-                ...hydrateProfile(profiles[firstProfileKey]),
-                monthYear: prev.monthYear,
-                workingDays: prev.workingDays,
-                leavesTaken: prev.leavesTaken,
-                arrearsDays: prev.arrearsDays,
-              }));
-            }
             setStatusType('warning');
             setStatusMessage('Supabase connection failed or tables missing. Using local storage fallback.');
           }
         } else {
           const profiles = loadProfilesFromStorage();
-          const firstProfileKey = Object.keys(profiles)[0];
           setSavedProfiles(profiles);
           setSavedPayslips(loadPayslipsFromStorage());
-          if (firstProfileKey) {
-            setFormData((prev) => ({
-              ...hydrateProfile(profiles[firstProfileKey]),
-              monthYear: prev.monthYear,
-              workingDays: prev.workingDays,
-              leavesTaken: prev.leavesTaken,
-              arrearsDays: prev.arrearsDays,
-            }));
-          }
         }
       };
 

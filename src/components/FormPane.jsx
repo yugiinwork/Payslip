@@ -146,8 +146,8 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Identification & Account Details</h3>
         {formData.identification.map((item) => (
-          <div key={item.id} className="draggable-editor-row" {...getDragHandlers('identification', formData.identification.findIndex((entry) => entry.id === item.id), reorderIdentification)}>
-            <div className="drag-handle" title="Drag to rearrange">
+          <div key={item.id} className="draggable-editor-row">
+            <div className="drag-handle" title="Drag to rearrange" {...getDragHandlers('identification', formData.identification.findIndex((entry) => entry.id === item.id), reorderIdentification)}>
               <GripVertical size={16} />
             </div>
             <div className="grid-row-card deduction-row">
@@ -219,8 +219,8 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Earnings Table</h3>
         {formData.earnings.map((earning) => (
-          <div key={earning.id} className="draggable-editor-row" {...getDragHandlers('earnings', formData.earnings.findIndex((entry) => entry.id === earning.id), reorderEarnings)}>
-            <div className="drag-handle" title="Drag to rearrange">
+          <div key={earning.id} className="draggable-editor-row">
+            <div className="drag-handle" title="Drag to rearrange" {...getDragHandlers('earnings', formData.earnings.findIndex((entry) => entry.id === earning.id), reorderEarnings)}>
               <GripVertical size={16} />
             </div>
             <div className="grid-row-card">
@@ -246,8 +246,8 @@ export default function FormPane({
           <div className="table-row-label">No deduction rows.</div>
         ) : null}
         {formData.deductions.map((deduction) => (
-          <div key={deduction.id} className="draggable-editor-row" {...getDragHandlers('deductions', getGlobalDeductionIndex(deduction.id), reorderDeductions)}>
-            <div className="drag-handle" title="Drag to rearrange">
+          <div key={deduction.id} className="draggable-editor-row">
+            <div className="drag-handle" title="Drag to rearrange" {...getDragHandlers('deductions', getGlobalDeductionIndex(deduction.id), reorderDeductions)}>
               <GripVertical size={16} />
             </div>
             <div className="grid-row-card deduction-row">
