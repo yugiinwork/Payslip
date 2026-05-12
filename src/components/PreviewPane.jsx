@@ -94,7 +94,27 @@ const detailRowsRight = (formData) => [
 ];
 
 export default function PreviewPane({ formData, calculations, onPrintPdf, readOnly = false }) {
-  const salaryRowCount = Math.max(calculations.earnings.length, calculations.deductions.length);
+  const computedDeductionAmounts = new Map(
+    calculations.deductions.map((row) => [row.id, row.amount])
+  );
+
+  const deductionRows = formData.deductions.map((row) => ({
+    ...row,
+    amount: computedDeductionAmounts.get(row.id) ?? row.amount,
+  }));
+
+  const primaryDeductions = deductionRows.filter((row) => row.category === 'primary');
+  const secondaryDeductions = deductionRows.filter((row) => row.category === 'other');
+
+  const deductionDisplayRows = secondaryDeductions.length > 0
+    ? [
+        ...primaryDeductions,
+        { id: 'other-deductions-heading', name: 'Other Deductions', amount: 'Amount', isSectionHeading: true },
+        ...secondaryDeductions,
+      ]
+    : primaryDeductions;
+
+  const salaryRowCount = Math.max(calculations.earnings.length, deductionDisplayRows.length);
   const paddedEarnings = [
     ...calculations.earnings,
     ...Array.from({ length: salaryRowCount - calculations.earnings.length }, (_, index) => ({
@@ -108,8 +128,8 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
     })),
   ];
   const paddedDeductions = [
-    ...calculations.deductions,
-    ...Array.from({ length: salaryRowCount - calculations.deductions.length }, (_, index) => ({
+    ...deductionDisplayRows,
+    ...Array.from({ length: salaryRowCount - deductionDisplayRows.length }, (_, index) => ({
       id: `empty-deduction-${index}`,
       name: '',
       amount: '',
@@ -195,9 +215,12 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
                   </thead>
                   <tbody>
                     {paddedDeductions.map((row) => (
-                      <tr key={row.id} className={row.isEmpty ? 'empty-salary-row' : ''}>
+                      <tr
+                        key={row.id}
+                        className={row.isSectionHeading ? 'salary-subheading-row' : row.isEmpty ? 'empty-salary-row' : ''}
+                      >
                         <td>{row.name || ''}</td>
-                        <td>{formatCurrency(row.amount, formData.branch)}</td>
+                        <td>{row.isSectionHeading ? row.amount : formatCurrency(row.amount, formData.branch)}</td>
                       </tr>
                     ))}
                   </tbody>

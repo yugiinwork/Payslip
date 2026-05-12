@@ -44,12 +44,66 @@ const EARNING_TEMPLATES = {
 
 const DEDUCTION_TEMPLATES = {
   India: [
-    { id: 1, name: 'PF', amount: '' },
-    { id: 2, name: 'Gratuity', amount: '' },
-    { id: 3, name: 'PF Employer', amount: '' },
-    { id: 4, name: 'Professional Tax', amount: '' },
+    { id: 1, name: 'PF', amount: '', category: 'primary' },
+    { id: 2, name: 'Gratuity', amount: '', category: 'other' },
+    { id: 3, name: 'PF Employer', amount: '', category: 'other' },
+    { id: 4, name: 'Professional Tax', amount: '', category: 'primary' },
   ],
   UAE: [],
+};
+
+const DETAIL_FIELD_LABELS = {
+  employeeId: 'Employee Code',
+  employeeName: 'Employee name',
+  designation: 'Designation',
+  location: 'Location',
+  branchOffice: 'Branch',
+  city: 'City',
+  group: 'Group',
+  department: 'Department',
+  panNumber: 'Permanent Account Number',
+  aadhaarNumber: 'AADHAR No',
+  joiningDate: 'Date of Joining',
+  company: 'Company',
+  bankName: 'Bank Name',
+  accountNumber: 'Bank Account Number',
+  ifscCode: 'IFSC Code',
+  pfAccountNumber: 'PF Account Number',
+  uanNumber: 'UAN Number',
+  esicAccountNumber: 'Esic Account Number',
+  workingDays: 'Total Working Days',
+  leavesTaken: 'LOP',
+  arrearsDays: 'Arrears Days',
+  taxRegime: 'Tax Regime',
+};
+
+const DEFAULT_DETAIL_ORDER = {
+  left: [
+    'employeeId',
+    'employeeName',
+    'designation',
+    'location',
+    'branchOffice',
+    'city',
+    'group',
+    'department',
+    'panNumber',
+    'aadhaarNumber',
+    'joiningDate',
+  ],
+  right: [
+    'company',
+    'bankName',
+    'accountNumber',
+    'ifscCode',
+    'pfAccountNumber',
+    'uanNumber',
+    'esicAccountNumber',
+    'workingDays',
+    'leavesTaken',
+    'arrearsDays',
+    'taxRegime',
+  ],
 };
 
 const IDENTIFICATION_TEMPLATES = {
@@ -126,6 +180,28 @@ const applyDerivedValues = (data) => {
   return { ...data, earnings: nextEarnings };
 };
 
+const reorderList = (list, fromIndex, toIndex) => {
+  const nextList = [...list];
+  const [movedItem] = nextList.splice(fromIndex, 1);
+  nextList.splice(toIndex, 0, movedItem);
+  return nextList;
+};
+
+const getDeductionCategory = (deduction) => {
+  if (deduction.category === 'primary' || deduction.category === 'other') {
+    return deduction.category;
+  }
+
+  const normalized = (deduction.name || '').trim().toLowerCase();
+  return normalized === 'pf' || normalized === 'professional tax' ? 'primary' : 'other';
+};
+
+const normalizeDeductions = (deductions = []) =>
+  deductions.map((deduction) => ({
+    ...deduction,
+    category: getDeductionCategory(deduction),
+  }));
+
 const createDefaultState = (branch = 'India') => {
   const previousMonthInfo = getPreviousMonthInfo();
 
@@ -149,7 +225,7 @@ const createDefaultState = (branch = 'India') => {
   arrearsDays: '0',
   taxRegime: 'New Tax Regime',
   earnings: buildEarningsForBranch(branch),
-  deductions: buildDeductionsForBranch(branch),
+  deductions: normalizeDeductions(buildDeductionsForBranch(branch)),
   identification: buildIdentificationForBranch(branch),
   ...BRANCH_PRESETS[branch],
   };
@@ -178,7 +254,7 @@ const hydrateProfile = (profile) => {
     ...createDefaultState(branch),
     ...profile,
     earnings: profile.earnings?.length ? profile.earnings : buildEarningsForBranch(branch),
-    deductions: profile.deductions?.length ? profile.deductions : buildDeductionsForBranch(branch),
+    deductions: normalizeDeductions(profile.deductions?.length ? profile.deductions : buildDeductionsForBranch(branch)),
     identification: profile.identification?.length ? profile.identification : buildIdentificationForBranch(branch),
   };
 };
@@ -329,6 +405,14 @@ function App() {
         };
       }
 
+      if (name === 'company') {
+        return {
+          ...prev,
+          company: value,
+          companyName: value,
+        };
+      }
+
       return { ...prev, [name]: value };
     });
   };
@@ -360,7 +444,7 @@ function App() {
         ...prev,
         branch: newBranch,
         earnings: buildEarningsForBranch(newBranch),
-        deductions: buildDeductionsForBranch(newBranch),
+        deductions: normalizeDeductions(buildDeductionsForBranch(newBranch)),
         identification: buildIdentificationForBranch(newBranch),
         ...BRANCH_PRESETS[newBranch],
       })
@@ -397,6 +481,13 @@ function App() {
     }));
   };
 
+  const reorderEarnings = (fromIndex, toIndex) => {
+    setFormData((prev) => ({
+      ...prev,
+      earnings: reorderList(prev.earnings, fromIndex, toIndex),
+    }));
+  };
+
   const handleDeductionChange = (id, field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -406,10 +497,10 @@ function App() {
     }));
   };
 
-  const addDeduction = () => {
+  const addDeduction = (category = 'primary') => {
     setFormData((prev) => ({
       ...prev,
-      deductions: [...prev.deductions, { id: Date.now(), name: '', amount: '' }],
+      deductions: [...prev.deductions, { id: Date.now(), name: '', amount: '', category }],
     }));
   };
 
@@ -417,6 +508,13 @@ function App() {
     setFormData((prev) => ({
       ...prev,
       deductions: prev.deductions.filter((item) => item.id !== id),
+    }));
+  };
+
+  const reorderDeductions = (fromIndex, toIndex) => {
+    setFormData((prev) => ({
+      ...prev,
+      deductions: reorderList(prev.deductions, fromIndex, toIndex),
     }));
   };
 
@@ -440,6 +538,13 @@ function App() {
     setFormData((prev) => ({
       ...prev,
       identification: prev.identification.filter((item) => item.id !== id),
+    }));
+  };
+
+  const reorderIdentification = (fromIndex, toIndex) => {
+    setFormData((prev) => ({
+      ...prev,
+      identification: reorderList(prev.identification, fromIndex, toIndex),
     }));
   };
 
@@ -591,9 +696,12 @@ function App() {
         handleDeductionChange={handleDeductionChange}
         addDeduction={addDeduction}
         removeDeduction={removeDeduction}
+        reorderEarnings={reorderEarnings}
+        reorderDeductions={reorderDeductions}
         handleIdentificationChange={handleIdentificationChange}
         addIdentification={addIdentification}
         removeIdentification={removeIdentification}
+        reorderIdentification={reorderIdentification}
         saveProfile={saveProfile}
         resetForm={resetForm}
         viewPreviousPayslips={() => {

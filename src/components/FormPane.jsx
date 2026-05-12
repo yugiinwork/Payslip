@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, Save, RotateCcw, Cloud, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Save, RotateCcw, Cloud, CheckCircle2, AlertCircle, Loader2, GripVertical } from 'lucide-react';
 
 export default function FormPane({
   formData,
@@ -15,13 +15,47 @@ export default function FormPane({
   handleDeductionChange,
   addDeduction,
   removeDeduction,
+  reorderEarnings,
+  reorderDeductions,
   handleIdentificationChange,
   addIdentification,
   removeIdentification,
+  reorderIdentification,
   saveProfile,
   resetForm,
   viewPreviousPayslips,
 }) {
+  const dragItemRef = React.useRef(null);
+  const primaryDeductions = formData.deductions.filter((item) => item.category === 'primary');
+  const otherDeductions = formData.deductions.filter((item) => item.category === 'other');
+
+  const getGlobalDeductionIndex = (id) =>
+    formData.deductions.findIndex((entry) => entry.id === id);
+
+  const getDragHandlers = (section, index, onReorder) => ({
+    draggable: true,
+    onDragStart: () => {
+      dragItemRef.current = { section, index };
+    },
+    onDragOver: (event) => {
+      event.preventDefault();
+    },
+    onDrop: () => {
+      if (!dragItemRef.current || dragItemRef.current.section !== section) {
+        return;
+      }
+
+      if (dragItemRef.current.index !== index) {
+        onReorder(dragItemRef.current.index, index);
+      }
+
+      dragItemRef.current = null;
+    },
+    onDragEnd: () => {
+      dragItemRef.current = null;
+    },
+  });
+
   return (
     <div className="form-pane">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -124,22 +158,27 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Identification & Account Details</h3>
         {formData.identification.map((item) => (
-          <div key={item.id} className="grid-row-card deduction-row">
-            <input
-              type="text"
-              placeholder="Field Name (e.g. PAN Number)"
-              value={item.name}
-              onChange={(e) => handleIdentificationChange(item.id, 'name', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Value"
-              value={item.value}
-              onChange={(e) => handleIdentificationChange(item.id, 'value', e.target.value)}
-            />
-            <button className="btn btn-outline icon-btn" onClick={() => removeIdentification(item.id)}>
-              <Trash2 size={16} />
-            </button>
+          <div key={item.id} className="draggable-editor-row" {...getDragHandlers('identification', formData.identification.findIndex((entry) => entry.id === item.id), reorderIdentification)}>
+            <div className="drag-handle" title="Drag to rearrange">
+              <GripVertical size={16} />
+            </div>
+            <div className="grid-row-card deduction-row">
+              <input
+                type="text"
+                placeholder="Field Name (e.g. PAN Number)"
+                value={item.name}
+                onChange={(e) => handleIdentificationChange(item.id, 'name', e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Value"
+                value={item.value}
+                onChange={(e) => handleIdentificationChange(item.id, 'value', e.target.value)}
+              />
+              <button className="btn btn-outline icon-btn" onClick={() => removeIdentification(item.id)}>
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         ))}
         <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addIdentification}>
@@ -192,15 +231,20 @@ export default function FormPane({
       <div className="form-section">
         <h3 className="form-section-title">Earnings Table</h3>
         {formData.earnings.map((earning) => (
-          <div key={earning.id} className="grid-row-card">
-            <input type="text" placeholder="Earning Name" value={earning.name} onChange={(e) => handleEarningChange(earning.id, 'name', e.target.value)} />
-            <input type="number" min="0" placeholder="Monthly Rate" value={earning.monthlyRate} onChange={(e) => handleEarningChange(earning.id, 'monthlyRate', e.target.value)} />
-            <input type="number" min="0" placeholder="Current Month" value={earning.currentMonth} readOnly />
-            <input type="number" min="0" placeholder="Arrears" value={earning.arrears} readOnly />
-            <input type="number" min="0" placeholder="Total" value={earning.total} readOnly />
-            <button className="btn btn-outline icon-btn" onClick={() => removeEarning(earning.id)}>
-              <Trash2 size={16} />
-            </button>
+          <div key={earning.id} className="draggable-editor-row" {...getDragHandlers('earnings', formData.earnings.findIndex((entry) => entry.id === earning.id), reorderEarnings)}>
+            <div className="drag-handle" title="Drag to rearrange">
+              <GripVertical size={16} />
+            </div>
+            <div className="grid-row-card">
+              <input type="text" placeholder="Earning Name" value={earning.name} onChange={(e) => handleEarningChange(earning.id, 'name', e.target.value)} />
+              <input type="number" min="0" placeholder="Monthly Rate" value={earning.monthlyRate} onChange={(e) => handleEarningChange(earning.id, 'monthlyRate', e.target.value)} />
+              <input type="number" min="0" placeholder="Current Month" value={earning.currentMonth} readOnly />
+              <input type="number" min="0" placeholder="Arrears" value={earning.arrears} readOnly />
+              <input type="number" min="0" placeholder="Total" value={earning.total} readOnly />
+              <button className="btn btn-outline icon-btn" onClick={() => removeEarning(earning.id)}>
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         ))}
         <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addEarning}>
@@ -210,20 +254,49 @@ export default function FormPane({
 
       <div className="form-section">
         <h3 className="form-section-title">Deductions Table</h3>
-        {formData.deductions.length === 0 ? (
+        {primaryDeductions.length === 0 ? (
           <div className="table-row-label">No deduction rows for this branch.</div>
         ) : null}
-        {formData.deductions.map((deduction) => (
-          <div key={deduction.id} className="grid-row-card deduction-row">
-            <input type="text" placeholder="Deduction Name" value={deduction.name} onChange={(e) => handleDeductionChange(deduction.id, 'name', e.target.value)} />
-            <input type="number" min="0" placeholder="Amount" value={deduction.amount} onChange={(e) => handleDeductionChange(deduction.id, 'amount', e.target.value)} />
-            <button className="btn btn-outline icon-btn" onClick={() => removeDeduction(deduction.id)}>
-              <Trash2 size={16} />
-            </button>
+        {primaryDeductions.map((deduction) => (
+          <div key={deduction.id} className="draggable-editor-row" {...getDragHandlers('deductions', getGlobalDeductionIndex(deduction.id), reorderDeductions)}>
+            <div className="drag-handle" title="Drag to rearrange">
+              <GripVertical size={16} />
+            </div>
+            <div className="grid-row-card deduction-row">
+              <input type="text" placeholder="Deduction Name" value={deduction.name} onChange={(e) => handleDeductionChange(deduction.id, 'name', e.target.value)} />
+              <input type="number" min="0" placeholder="Amount" value={deduction.amount} onChange={(e) => handleDeductionChange(deduction.id, 'amount', e.target.value)} />
+              <button className="btn btn-outline icon-btn" onClick={() => removeDeduction(deduction.id)}>
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         ))}
-        <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={addDeduction}>
+        <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={() => addDeduction('primary')}>
           <Plus size={16} /> Add Deduction Row
+        </button>
+      </div>
+
+      <div className="form-section">
+        <h3 className="form-section-title">Other Deductions Table</h3>
+        {otherDeductions.length === 0 ? (
+          <div className="table-row-label">No other deduction rows yet.</div>
+        ) : null}
+        {otherDeductions.map((deduction) => (
+          <div key={deduction.id} className="draggable-editor-row" {...getDragHandlers('deductions', getGlobalDeductionIndex(deduction.id), reorderDeductions)}>
+            <div className="drag-handle" title="Drag to rearrange">
+              <GripVertical size={16} />
+            </div>
+            <div className="grid-row-card deduction-row">
+              <input type="text" placeholder="Deduction Name" value={deduction.name} onChange={(e) => handleDeductionChange(deduction.id, 'name', e.target.value)} />
+              <input type="number" min="0" placeholder="Amount" value={deduction.amount} onChange={(e) => handleDeductionChange(deduction.id, 'amount', e.target.value)} />
+              <button className="btn btn-outline icon-btn" onClick={() => removeDeduction(deduction.id)}>
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
+        <button className="btn btn-outline" style={{ marginTop: '8px', width: '100%' }} onClick={() => addDeduction('other')}>
+          <Plus size={16} /> Add Other Deduction Row
         </button>
       </div>
       <div style={{ height: '40px' }}></div>
