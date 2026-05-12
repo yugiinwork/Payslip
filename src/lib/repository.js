@@ -1,58 +1,67 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 
+const getIdentificationValue = (identification, name) => {
+  if (!Array.isArray(identification)) return null;
+  return identification.find(i => i.name?.toLowerCase() === name.toLowerCase())?.value || null;
+};
+
 const mapEmployeeFromRow = (row) => ({
   id: row.id,
   employeeName: row.employee_name || '',
   employeeId: row.employee_code || '',
   branch: row.branch || 'India',
   designation: row.designation || '',
-  department: row.department || '',
   location: row.location || '',
   city: row.city || '',
-  group: row.group_name || '',
-  panNumber: row.pan_number || '',
-  aadhaarNumber: row.aadhaar_number || '',
   joiningDate: row.joining_date || '',
   companyName: row.company_name || '',
   companyAddress: row.company_address || '',
   company: row.company_name || '',
   bankName: row.bank_name || '',
   accountNumber: row.account_number || '',
-  ifscCode: row.ifsc_code || '',
-  pfAccountNumber: row.pf_account_number || '',
-  uanNumber: row.uan_number || '',
-  esicAccountNumber: row.esic_account_number || '',
   branchOffice: row.branch_office || '',
   taxRegime: row.tax_regime || 'New Tax Regime',
   earnings: Array.isArray(row.earnings) ? row.earnings : [],
   deductions: Array.isArray(row.deductions) ? row.deductions : [],
+  identification: Array.isArray(row.identification) ? row.identification : [
+    { id: 1, name: 'Department', value: row.department || '' },
+    { id: 2, name: 'PAN Number', value: row.pan_number || '' },
+    { id: 3, name: 'AADHAR No', value: row.aadhaar_number || '' },
+    { id: 4, name: 'IFSC Code', value: row.ifsc_code || '' },
+    { id: 5, name: 'PF Account Number', value: row.pf_account_number || '' },
+    { id: 6, name: 'UAN Number', value: row.uan_number || '' },
+    { id: 7, name: 'ESIC Account Number', value: row.esic_account_number || '' },
+  ],
 });
 
-const mapEmployeeToRow = (formData) => ({
-  employee_name: formData.employeeName,
-  employee_code: formData.employeeId || null,
-  branch: formData.branch,
-  designation: formData.designation || null,
-  department: formData.department || null,
-  location: formData.location || null,
-  city: formData.city || null,
-  group_name: formData.group || null,
-  pan_number: formData.panNumber || null,
-  aadhaar_number: formData.aadhaarNumber || null,
-  joining_date: formData.joiningDate || null,
-  company_name: formData.companyName || formData.company || null,
-  company_address: formData.companyAddress || null,
-  bank_name: formData.bankName || null,
-  account_number: formData.accountNumber || null,
-  ifsc_code: formData.ifscCode || null,
-  pf_account_number: formData.pfAccountNumber || null,
-  uan_number: formData.uanNumber || null,
-  esic_account_number: formData.esicAccountNumber || null,
-  branch_office: formData.branchOffice || null,
-  tax_regime: formData.taxRegime || null,
-  earnings: formData.earnings,
-  deductions: formData.deductions,
-});
+const mapEmployeeToRow = (formData) => {
+  const idents = formData.identification || [];
+  return {
+    employee_name: formData.employeeName,
+    employee_code: formData.employeeId || null,
+    branch: formData.branch,
+    designation: formData.designation || null,
+    location: formData.location || null,
+    city: formData.city || null,
+    joining_date: formData.joiningDate || null,
+    company_name: formData.companyName || formData.company || null,
+    company_address: formData.companyAddress || null,
+    bank_name: formData.bankName || null,
+    account_number: formData.accountNumber || null,
+    branch_office: formData.branchOffice || null,
+    tax_regime: formData.taxRegime || null,
+    earnings: formData.earnings,
+    deductions: formData.deductions,
+    // Sync identification fields back to columns for compatibility
+    pan_number: getIdentificationValue(idents, 'PAN Number'),
+    aadhaar_number: getIdentificationValue(idents, 'AADHAR No'),
+    ifsc_code: getIdentificationValue(idents, 'IFSC Code'),
+    pf_account_number: getIdentificationValue(idents, 'PF Account Number'),
+    uan_number: getIdentificationValue(idents, 'UAN Number'),
+    esic_account_number: getIdentificationValue(idents, 'ESIC Account Number'),
+    department: getIdentificationValue(idents, 'Department'),
+  };
+};
 
 export const fetchEmployees = async () => {
   if (!isSupabaseConfigured) {

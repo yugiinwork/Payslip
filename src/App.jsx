@@ -108,20 +108,22 @@ const DEFAULT_DETAIL_ORDER = {
 
 const IDENTIFICATION_TEMPLATES = {
   India: [
-    { id: 1, name: 'PAN Number', value: '' },
-    { id: 2, name: 'AADHAR No', value: '' },
-    { id: 3, name: 'IFSC Code', value: '' },
-    { id: 4, name: 'PF Account Number', value: '' },
-    { id: 5, name: 'UAN Number', value: '' },
-    { id: 6, name: 'ESIC Account Number', value: '' },
+    { id: 1, name: 'Department', value: '' },
+    { id: 2, name: 'PAN Number', value: '' },
+    { id: 3, name: 'AADHAR No', value: '' },
+    { id: 4, name: 'IFSC Code', value: '' },
+    { id: 5, name: 'PF Account Number', value: '' },
+    { id: 6, name: 'UAN Number', value: '' },
+    { id: 7, name: 'ESIC Account Number', value: '' },
   ],
   UAE: [
-    { id: 1, name: 'PAN Number', value: '' },
-    { id: 2, name: 'AADHAR No', value: '' },
-    { id: 3, name: 'IFSC Code', value: '' },
-    { id: 4, name: 'PF Account Number', value: '' },
-    { id: 5, name: 'UAN Number', value: '' },
-    { id: 6, name: 'ESIC Account Number', value: '' },
+    { id: 1, name: 'Department', value: '' },
+    { id: 2, name: 'PAN Number', value: '' },
+    { id: 3, name: 'AADHAR No', value: '' },
+    { id: 4, name: 'IFSC Code', value: '' },
+    { id: 5, name: 'PF Account Number', value: '' },
+    { id: 6, name: 'UAN Number', value: '' },
+    { id: 7, name: 'ESIC Account Number', value: '' },
   ],
 };
 
@@ -210,10 +212,8 @@ const createDefaultState = (branch = 'India') => {
   employeeName: '',
   employeeId: '',
   designation: '',
-  department: '',
   location: '',
   city: '',
-  group: '',
   joiningDate: '',
   bankName: '',
   accountNumber: '',
@@ -541,11 +541,54 @@ function App() {
     }));
   };
 
+<<<<<<< HEAD
   const reorderIdentification = (fromIndex, toIndex) => {
     setFormData((prev) => ({
       ...prev,
       identification: reorderList(prev.identification, fromIndex, toIndex),
     }));
+=======
+  const moveEarning = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const next = [...prev.earnings];
+      const draggedIndex = next.findIndex((item) => item.id === draggedId);
+      const targetIndex = next.findIndex((item) => item.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      const [draggedItem] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, draggedItem);
+      return { ...prev, earnings: next };
+    });
+  };
+
+  const moveDeduction = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const next = [...prev.deductions];
+      const draggedIndex = next.findIndex((item) => item.id === draggedId);
+      const targetIndex = next.findIndex((item) => item.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      const [draggedItem] = next.splice(draggedIndex, 1);
+      next.splice(targetIndex, 0, draggedItem);
+      return { ...prev, deductions: next };
+    });
+  };
+
+  const moveIdentification = (draggedId, targetId) => {
+    if (draggedId === targetId) return;
+    setFormData((prev) => {
+      const nextIdent = [...prev.identification];
+      const draggedIndex = nextIdent.findIndex((item) => item.id === draggedId);
+      const targetIndex = nextIdent.findIndex((item) => item.id === targetId);
+
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const [draggedItem] = nextIdent.splice(draggedIndex, 1);
+      nextIdent.splice(targetIndex, 0, draggedItem);
+
+      return { ...prev, identification: nextIdent };
+    });
+>>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
   };
 
   const saveProfile = () => {
@@ -693,15 +736,24 @@ function App() {
         handleEarningChange={handleEarningChange}
         addEarning={addEarning}
         removeEarning={removeEarning}
+        moveEarning={moveEarning}
         handleDeductionChange={handleDeductionChange}
         addDeduction={addDeduction}
         removeDeduction={removeDeduction}
+<<<<<<< HEAD
         reorderEarnings={reorderEarnings}
         reorderDeductions={reorderDeductions}
         handleIdentificationChange={handleIdentificationChange}
         addIdentification={addIdentification}
         removeIdentification={removeIdentification}
         reorderIdentification={reorderIdentification}
+=======
+        moveDeduction={moveDeduction}
+        handleIdentificationChange={handleIdentificationChange}
+        addIdentification={addIdentification}
+        removeIdentification={removeIdentification}
+        moveIdentification={moveIdentification}
+>>>>>>> 39e2cab0c6be31a5f5f48785c3b485ae036c5ee5
         saveProfile={saveProfile}
         resetForm={resetForm}
         viewPreviousPayslips={() => {
