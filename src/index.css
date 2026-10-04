@@ -407,6 +407,7 @@ body {
 .payslip-frame {
   border: 1.5px solid #222;
   width: 100%;
+  overflow: hidden;
 }
 
 .payslip-header {
@@ -566,6 +567,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 300px;
   border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
 }
 
 .words-cell,

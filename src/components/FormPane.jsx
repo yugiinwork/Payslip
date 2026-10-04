@@ -200,14 +200,36 @@ export default function FormPane({
             <input type="number" min="0" name="workingDays" value={formData.workingDays} onChange={handleInputChange} />
           </div>
           <div className="input-group" style={{ flex: 1 }}>
-            <label>LOP</label>
-            <input type="number" min="0" name="leavesTaken" value={formData.leavesTaken} onChange={handleInputChange} />
+            <label>LOP {formData.showLop === false ? '(Hidden)' : ''}</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input type="number" min="0" name="leavesTaken" value={formData.leavesTaken} onChange={handleInputChange} style={{ flex: 1, opacity: formData.showLop === false ? 0.5 : 1 }} disabled={formData.showLop === false} />
+              {formData.showLop !== false ? (
+                <button type="button" className="btn btn-outline icon-btn" onClick={() => handleInputChange({ target: { name: 'showLop', value: false } })} title="Remove LOP from preview">
+                  <Trash2 size={16} />
+                </button>
+              ) : (
+                <button type="button" className="btn btn-outline icon-btn" onClick={() => handleInputChange({ target: { name: 'showLop', value: true } })} title="Restore LOP to preview">
+                  <RotateCcw size={16} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
           <div className="input-group" style={{ flex: 1 }}>
-            <label>Arrears Days</label>
-            <input type="number" min="0" step="0.01" name="arrearsDays" value={formData.arrearsDays} onChange={handleInputChange} />
+            <label>Arrears Days {formData.showArrears === false ? '(Hidden)' : ''}</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input type="number" min="0" step="0.01" name="arrearsDays" value={formData.arrearsDays} onChange={handleInputChange} style={{ flex: 1, opacity: formData.showArrears === false ? 0.5 : 1 }} disabled={formData.showArrears === false} />
+              {formData.showArrears !== false ? (
+                <button type="button" className="btn btn-outline icon-btn" onClick={() => handleInputChange({ target: { name: 'showArrears', value: false } })} title="Remove Arrears Days from preview">
+                  <Trash2 size={16} />
+                </button>
+              ) : (
+                <button type="button" className="btn btn-outline icon-btn" onClick={() => handleInputChange({ target: { name: 'showArrears', value: true } })} title="Restore Arrears Days to preview">
+                  <RotateCcw size={16} />
+                </button>
+              )}
+            </div>
           </div>
           <div className="input-group" style={{ flex: 1 }}>
             <label>Tax Regime</label>

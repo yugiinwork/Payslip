@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import FormPane from './components/FormPane';
 import PreviewPane from './components/PreviewPane';
+import FFSFormPane from './components/FFSFormPane';
+import FFSPreviewPane from './components/FFSPreviewPane';
 import PreviousPayslipsPage from './components/PreviousPayslipsPage';
 import { calculateSalary } from './utils/calculations';
 import { exportToPDF } from './utils/export';
@@ -212,9 +214,12 @@ const createDefaultState = (branch = 'India') => {
   monthYear: previousMonthInfo.monthYear,
   workingDays: previousMonthInfo.totalDays,
   leavesTaken: '0',
+  showLop: true,
   paymentDate: '',
+  finalSettlementDate: '',
   branchOffice: '',
   arrearsDays: '0',
+  showArrears: true,
   taxRegime: 'New Tax Regime',
   earnings: buildEarningsForBranch(branch),
   deductions: normalizeDeductions(buildDeductionsForBranch(branch)),
@@ -287,6 +292,8 @@ function App() {
   const [currentPage, setCurrentPage] = useState('builder');
   const [selectedPayslipRecord, setSelectedPayslipRecord] = useState(null);
   const [formData, setFormData] = useState(() => createDefaultState());
+  const [docType, setDocType] = useState('payslip');
+  const [ffsData, setFfsData] = useState(null);
   const hasHydratedProfile = useRef(false);
 
   const [calculations, setCalculations] = useState(calculateSalary(formData));
@@ -638,35 +645,72 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <FormPane
-        formData={formData}
-        profileOptions={profileOptions}
-        statusMessage={statusMessage}
-        statusType={statusType}
-        handleInputChange={handleInputChange}
-        handleBranchChange={handleBranchChange}
-        handleEmployeeNameChange={handleEmployeeNameChange}
-        handleEarningChange={handleEarningChange}
-        addEarning={addEarning}
-        removeEarning={removeEarning}
-        reorderEarnings={reorderEarnings}
-        reorderDeductions={reorderDeductions}
-        handleDeductionChange={handleDeductionChange}
-        addDeduction={addDeduction}
-        removeDeduction={removeDeduction}
-        handleIdentificationChange={handleIdentificationChange}
-        addIdentification={addIdentification}
-        removeIdentification={removeIdentification}
-        reorderIdentification={reorderIdentification}
-        saveProfile={saveProfile}
-        resetForm={resetForm}
-        viewPreviousPayslips={() => {
-          setSelectedPayslipRecord(savedPayslips[0] || null);
-          setCurrentPage('history');
+    <div className="app-container" style={{ position: 'relative' }}>
+      {/* Tab switcher */}
+      <div
+        className="doc-type-switcher print-hide"
+        style={{
+          position: 'absolute', top: 12, right: 12,
+          display: 'flex', gap: 6, zIndex: 20,
+          background: 'var(--bg-main)', borderRadius: 8,
+          padding: '4px', border: '1px solid var(--border-color)'
         }}
-      />
-      <PreviewPane formData={formData} calculations={calculations} onPrintPdf={handlePrintPdf} />
+      >
+        <button
+          type="button"
+          className={`btn ${docType === 'payslip' ? 'btn-primary' : 'btn-outline'}`}
+          style={{ fontSize: '12px', padding: '4px 12px' }}
+          onClick={() => setDocType('payslip')}
+        >
+          Payslip
+        </button>
+        <button
+          type="button"
+          className={`btn ${docType === 'ffs' ? 'btn-primary' : 'btn-outline'}`}
+          style={{ fontSize: '12px', padding: '4px 12px' }}
+          onClick={() => setDocType('ffs')}
+        >
+          Full &amp; Final Settlement
+        </button>
+      </div>
+
+      {docType === 'payslip' ? (
+        <>
+          <FormPane
+            formData={formData}
+            profileOptions={profileOptions}
+            statusMessage={statusMessage}
+            statusType={statusType}
+            handleInputChange={handleInputChange}
+            handleBranchChange={handleBranchChange}
+            handleEmployeeNameChange={handleEmployeeNameChange}
+            handleEarningChange={handleEarningChange}
+            addEarning={addEarning}
+            removeEarning={removeEarning}
+            reorderEarnings={reorderEarnings}
+            reorderDeductions={reorderDeductions}
+            handleDeductionChange={handleDeductionChange}
+            addDeduction={addDeduction}
+            removeDeduction={removeDeduction}
+            handleIdentificationChange={handleIdentificationChange}
+            addIdentification={addIdentification}
+            removeIdentification={removeIdentification}
+            reorderIdentification={reorderIdentification}
+            saveProfile={saveProfile}
+            resetForm={resetForm}
+            viewPreviousPayslips={() => {
+              setSelectedPayslipRecord(savedPayslips[0] || null);
+              setCurrentPage('history');
+            }}
+          />
+          <PreviewPane formData={formData} calculations={calculations} onPrintPdf={handlePrintPdf} />
+        </>
+      ) : (
+        <>
+          <FFSFormPane ffsData={ffsData} onFfsChange={setFfsData} />
+          <FFSPreviewPane ffsData={ffsData} onPrint={() => window.print()} />
+        </>
+      )}
     </div>
   );
 }

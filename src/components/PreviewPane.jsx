@@ -80,16 +80,19 @@ const detailRowsLeft = (formData) => [
   ['Date of Joining', formatDate(formData.joiningDate)],
 ];
 
-const detailRowsRight = (formData) => [
-  ['Company', formData.company],
-  ['Bank Name', formData.bankName],
-  ['Bank Account Number', formData.accountNumber],
-  ... (formData.identification || []).slice(Math.ceil((formData.identification || []).length / 2)).map(item => [item.name, item.value]),
-  ['Total Working Days', formData.workingDays],
-  ['LOP', formData.leavesTaken],
-  ['Arrears Days', formData.arrearsDays],
-  ['Tax Regime', formData.taxRegime],
-];
+const detailRowsRight = (formData) => {
+  const rows = [
+    ['Company', formData.company],
+    ['Bank Name', formData.bankName],
+    ['Bank Account Number', formData.accountNumber],
+    ... (formData.identification || []).slice(Math.ceil((formData.identification || []).length / 2)).map(item => [item.name, item.value]),
+    ['Total Working Days', formData.workingDays],
+  ];
+  if (formData.showLop !== false) rows.push(['LOP', formData.leavesTaken]);
+  if (formData.showArrears !== false) rows.push(['Arrears Days', formData.arrearsDays]);
+  rows.push(['Tax Regime', formData.taxRegime]);
+  return rows;
+};
 
 export default function PreviewPane({ formData, calculations, onPrintPdf, readOnly = false }) {
   const computedDeductionAmounts = new Map(
@@ -138,9 +141,28 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
         ) : null}
 
         <div className="a4-page payslip-page" id="payslip">
-          <div className="payslip-frame">
+          <div className="payslip-frame" style={{ position: 'relative' }}>
+            <div
+              className="print-watermark"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-40deg)',
+                fontSize: '1.25rem',
+                color: 'rgba(0, 0, 0, 0.05)',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                zIndex: 0,
+                fontWeight: 'bold',
+                userSelect: 'none',
+                textAlign: 'center',
+              }}
+            >
+              {formData.companyName || 'COMPANY NAME'}
+            </div>
             <div className="payslip-header">
-              <div className="company-panel">
+              <div className="company-panel" style={{ position: 'relative', zIndex: 1 }}>
                 <h1>{formData.companyName || 'COMPANY NAME'}</h1>
                 {formData.companySubtitle ? <p className="company-subtitle">{formData.companySubtitle}</p> : null}
                 {formData.companyAddress ? <p className="company-address">{formData.companyAddress}</p> : null}
@@ -228,9 +250,13 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
               </div>
             </div>
 
-            <div className="footer-row">
+            <div className="footer-row" style={{ position: 'relative', zIndex: 1 }}>
               <div className="words-cell">In words ( {formData.branch === 'UAE' ? 'AED' : 'Rs'} ) : {numberToWords(calculations.netSalary)}</div>
               <div className="net-cell">Net Salary : {formatCurrency(calculations.netSalary, formData.branch)}</div>
+            </div>
+
+            <div style={{ textAlign: 'center', fontSize: '10px', padding: '8px 0 8px 0', color: '#0c0b0bff', fontFamily: 'Calibri, sans-serif', fontWeight: 'bold', position: 'relative', zIndex: 1 }}>
+              THIS IS A COMPUTER GENERATED PAYSLIP SO SIGNATURE IS NOT REQUIRED.
             </div>
           </div>
         </div>
