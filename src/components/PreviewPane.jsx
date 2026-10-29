@@ -133,7 +133,7 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
     <div className="preview-pane">
       <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         {!readOnly ? (
-          <div className="preview-actions print-hide">
+          <div className="preview-actions print-hide" style={{ marginTop: '40px' }}>
             <button className="btn btn-primary" onClick={onPrintPdf}>
               <Printer size={18} /> Print PDF
             </button>
@@ -242,11 +242,33 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
             <div className="totals-row">
               <div className="totals-cell">
                 <span>Total Earnings</span>
-                <strong>{formatCurrency(calculations.grossSalary, formData.branch)}</strong>
+                <strong>{formatCurrency(calculations.totalEarnings, formData.branch)}</strong>
               </div>
               <div className="totals-cell">
                 <span>Total Deductions</span>
                 <strong>{formatCurrency(calculations.totalDeductions, formData.branch)}</strong>
+              </div>
+            </div>
+
+            <div className="totals-row" style={{ borderTop: 'none', paddingTop: 0 }}>
+              <div className="totals-cell">
+                <span>LOP Deduction</span>
+                <strong style={{ color: '#c0392b' }}>(-) {formatCurrency(calculations.lopDeduction, formData.branch)}</strong>
+              </div>
+              <div className="totals-cell">
+                <span>&nbsp;</span>
+                <strong>&nbsp;</strong>
+              </div>
+            </div>
+
+            <div className="totals-row" style={{ borderTop: 'none', paddingTop: 0 }}>
+              <div className="totals-cell">
+                <span>Gross Salary (Earnings − LOP)</span>
+                <strong>{formatCurrency(calculations.grossSalary, formData.branch)}</strong>
+              </div>
+              <div className="totals-cell">
+                <span>&nbsp;</span>
+                <strong>&nbsp;</strong>
               </div>
             </div>
 
