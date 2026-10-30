@@ -241,7 +241,7 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
 
             <div className="totals-row">
               <div className="totals-cell">
-                <span>Total Earnings</span>
+                <span>Gross Salary</span>
                 <strong>{formatCurrency(calculations.totalEarnings, formData.branch)}</strong>
               </div>
               <div className="totals-cell">
@@ -263,7 +263,7 @@ export default function PreviewPane({ formData, calculations, onPrintPdf, readOn
 
             <div className="totals-row" style={{ borderTop: 'none', paddingTop: 0 }}>
               <div className="totals-cell">
-                <span>Gross Salary (Earnings − LOP)</span>
+                <span>Total Earnings</span>
                 <strong>{formatCurrency(calculations.grossSalary, formData.branch)}</strong>
               </div>
               <div className="totals-cell">
