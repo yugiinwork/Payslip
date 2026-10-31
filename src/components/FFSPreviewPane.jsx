@@ -72,8 +72,20 @@ const td = (extra = {}) => ({
 /* ══════════════════════════════════════════════════════════ */
 export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
   const d = ffsData || {};
-  const earnings   = d.earnings   || [];
-  const deductions = d.deductions || [];
+  const earnings   = d.earnings   || [
+    { id: 1, name: 'Basic', amount: '' },
+    { id: 2, name: 'House Rent Allowance', amount: '' },
+    { id: 3, name: 'Conveyance Allowance', amount: '' },
+    { id: 4, name: 'Bonus', amount: '' },
+    { id: 5, name: 'Commission', amount: '' },
+    { id: 6, name: 'Fixed Allowance', amount: '' },
+    { id: 7, name: 'Leave Encashment', amount: '' },
+  ];
+  const deductions = d.deductions || [
+    { id: 1, name: 'PF', amount: '' },
+    { id: 2, name: 'Professional Tax', amount: '' },
+    { id: 3, name: 'Other Deductions', amount: '' },
+  ];
 
   const grossEarnings   = earnings.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
   const totalDeductions = deductions.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
@@ -83,17 +95,22 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
   const maxRows = Math.max(earnings.length, deductions.length);
 
   /* ─── detail rows ─── */
-  const detailRows = [
-    ['Employee Name', d.employeeName, 'Employee No',           d.employeeNo],
-    ['Designation',   d.designation,  'Bank Account No',       d.bankAccountNo],
-    ['Date of Joining', fmtDate(d.dateOfJoining), 'PF A/C Number', d.pfAccountNumber],
-    ['Pay Period',    fmtMonthYear(d.payPeriod), 'UAN',          d.uan],
-    ['Final Settlement Date', fmtDate(d.finalSettlementDate), 'Paid Days :', d.paidDays],
-    ['ESI Number',    d.esiNumber,    'LOP Days',              d.lopDays],
+  const summaryRows = d.summaryRows || [
+    { id: 'employeeName', label: 'Employee Name', valueKey: 'employeeName' },
+    { id: 'employeeNo', label: 'Employee ID', valueKey: 'employeeNo' },
+    { id: 'designation', label: 'Designation', valueKey: 'designation' },
+    { id: 'bankAccountNo', label: 'Bank Account No', valueKey: 'bankAccountNo' },
+    { id: 'dateOfJoining', label: 'Date of Joining', valueKey: 'dateOfJoining' },
+    { id: 'payPeriod', label: 'Pay Period', valueKey: 'payPeriod' },
+    { id: 'finalSettlementDate', label: 'Final Settlement Date', valueKey: 'finalSettlementDate' },
+    { id: 'uan', label: 'UAN', valueKey: 'uan' },
   ];
+  const displayValue = (key) => ({ dateOfJoining: fmtDate(d.dateOfJoining), finalSettlementDate: fmtDate(d.finalSettlementDate), payPeriod: fmtMonthYear(d.payPeriod) }[key] ?? d[key] ?? '');
+  const summaryPairs = [];
+  for (let i = 0; i < summaryRows.length; i += 2) summaryPairs.push([summaryRows[i], summaryRows[i + 1]]);
 
   return (
-    <div className="preview-pane">
+    <div className="preview-pane ffs-preview-pane">
       <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
 
         {/* Print button */}
@@ -114,12 +131,30 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
             background: '#fff',
           }}
         >
-          <div style={{ border: '1px solid #aaa', margin: '0' }}>
+          <div style={{ border: '1px solid #aaa', margin: '0', position: 'relative', isolation: 'isolate' }}>
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-40deg)',
+                color: 'rgba(0, 0, 0, 0.06)',
+                fontSize: '32px',
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                userSelect: 'none',
+                zIndex: -1,
+              }}
+            >
+              {(d.companyName || 'Kevins Consulting Engineering Services Pvt Ltd').toUpperCase()}
+            </div>
 
             {/* ── Company Name ── */}
             <div style={{ padding: '12px 16px 8px 16px' }}>
               <div style={{ fontSize: '22px', fontWeight: '700', color: '#111', lineHeight: 1.2 }}>
-                {d.companyName || 'Company Name'}
+                {d.companyName || 'Kevins Consulting Engineering Services Pvt Ltd'}
               </div>
             </div>
 
@@ -151,12 +186,12 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
             {/* ── Employee detail rows ── */}
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
               <tbody>
-                {detailRows.map(([l1, v1, l2, v2], i) => (
+                {summaryPairs.map(([left, right], i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #ddd' }}>
-                    <td style={td({ width: '17%', color: '#333' })}>{l1}</td>
-                    <td style={td({ width: '33%' })}>: {v1 || ''}</td>
-                    <td style={td({ width: '17%', color: '#333', borderLeft: '1px solid #ddd' })}>{l2}</td>
-                    <td style={td({ width: '33%' })}>: {v2 || ''}</td>
+                    <td style={td({ width: '17%', color: '#333' })}>{left?.label || ''}</td>
+                    <td style={td({ width: '33%' })}>{left ? `: ${displayValue(left.valueKey)}` : ''}</td>
+                    <td style={td({ width: '17%', color: '#333', borderLeft: '1px solid #ddd' })}>{right?.label || ''}</td>
+                    <td style={td({ width: '33%' })}>{right ? `: ${displayValue(right.valueKey)}` : ''}</td>
                   </tr>
                 ))}
               </tbody>
@@ -168,10 +203,8 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
                 <tr>
                   <th style={th({ textAlign: 'left', borderRight: B, width: '24%' })}>EARNINGS</th>
                   <th style={th({ textAlign: 'right', borderRight: B, width: '13%' })}>AMOUNT</th>
-                  <th style={th({ textAlign: 'right', borderRight: B, width: '13%' })}>YTD</th>
                   <th style={th({ textAlign: 'left', borderRight: B, width: '24%' })}>DEDUCTIONS</th>
                   <th style={th({ textAlign: 'right', borderRight: B, width: '13%' })}>AMOUNT</th>
-                  <th style={th({ textAlign: 'right', width: '13%' })}>YTD</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,10 +215,8 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
                     <tr key={i} style={{ borderBottom: '1px solid #eee' }}>
                       <td style={td({ borderRight: B })}>{e.name  || ''}</td>
                       <td style={td({ textAlign: 'right', borderRight: B })}>{e.amount  !== '' && e.amount  != null ? fmt(e.amount)  : ''}</td>
-                      <td style={td({ textAlign: 'right', borderRight: B })}>{e.ytd     !== '' && e.ytd     != null ? fmt(e.ytd)     : ''}</td>
                       <td style={td({ borderRight: B })}>{dd.name || ''}</td>
                       <td style={td({ textAlign: 'right', borderRight: B })}>{dd.amount !== '' && dd.amount != null ? fmt(dd.amount) : ''}</td>
-                      <td style={td({ textAlign: 'right' })}>{dd.ytd !== '' && dd.ytd != null ? fmt(dd.ytd) : ''}</td>
                     </tr>
                   );
                 })}
@@ -194,10 +225,8 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
                 <tr style={{ borderTop: B, fontWeight: '700' }}>
                   <td style={td({ borderRight: B, fontWeight: '700' })}>Gross Earnings</td>
                   <td style={td({ textAlign: 'right', borderRight: B, fontWeight: '700' })}>{fmt(grossEarnings)}</td>
-                  <td style={td({ borderRight: B })}></td>
                   <td style={td({ borderRight: B, fontWeight: '700' })}>Total Deductions</td>
                   <td style={td({ textAlign: 'right', borderRight: B, fontWeight: '700' })}>{fmt(totalDeductions)}</td>
-                  <td style={td()}></td>
                 </tr>
               </tbody>
             </table>
@@ -218,6 +247,10 @@ export default function FFSPreviewPane({ ffsData, onPrint, readOnly = false }) {
                 <tr style={{ borderBottom: '1px solid #eee' }}>
                   <td colSpan={3} style={td({ borderRight: B })}>Total Deductions</td>
                   <td style={td({ textAlign: 'right' })}>(-) {fmt(totalDeductions)}</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #eee' }}>
+                  <td colSpan={3} style={td({ borderRight: B })}>Reimbursements</td>
+                  <td style={td({ textAlign: 'right' })}>(+) {fmt(reimbursements)}</td>
                 </tr>
                 <tr style={{ borderTop: B, fontWeight: '700' }}>
                   <td style={td({ width: '40%' })}></td>

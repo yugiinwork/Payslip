@@ -56,7 +56,8 @@ body {
 
 @media print {
   .form-pane {
-    display: none; /* Hide form when printing */
+    display: none;
+    /* Hide form when printing */
   }
 }
 
@@ -72,7 +73,9 @@ body {
 }
 
 @media print {
-  html, body {
+
+  html,
+  body {
     background: transparent;
     margin: 0;
     padding: 0;
@@ -94,6 +97,10 @@ body {
   margin-bottom: 12px;
 }
 
+.ffs-preview-pane {
+  padding-top: 70px;
+}
+
 /* Standard A4 Paper size setup */
 .a4-page {
   width: 100%;
@@ -101,7 +108,7 @@ body {
   padding: 0;
   margin: 0 auto;
   background: white;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
   position: relative;
 }
@@ -135,6 +142,7 @@ body {
 .form-section {
   margin-bottom: 32px;
 }
+
 .form-section-title {
   font-size: 1.125rem;
   font-weight: 600;
@@ -157,7 +165,7 @@ body {
   color: var(--text-main);
 }
 
-.input-group input, 
+.input-group input,
 .input-group select {
   padding: 10px 12px;
   border: 1px solid var(--border-color);
@@ -195,6 +203,7 @@ body {
   background: var(--primary);
   color: white;
 }
+
 .btn-primary:hover {
   background: #1f2937;
 }
@@ -203,6 +212,7 @@ body {
   background: var(--secondary);
   color: white;
 }
+
 .btn-secondary:hover {
   background: #f97316;
 }
@@ -212,6 +222,7 @@ body {
   border: 1px solid var(--border-color);
   color: var(--text-main);
 }
+
 .btn-outline:hover {
   background: var(--border-color);
 }
@@ -605,6 +616,7 @@ body {
 }
 
 @media (max-width: 768px) {
+
   .grid-row-card,
   .deduction-row,
   .details-grid,
